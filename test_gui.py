@@ -16,8 +16,7 @@ from time import gmtime, strftime
 
 API_PREFIX = 'https://api.particle.io'
 API_VERSION = '/v1/'
-ack_token = 'blank'
-
+ack_token = ''
 
 readingsPerMsg = 20
 scans = []
@@ -68,8 +67,6 @@ class eventThread(threading.Thread):
 class MyGUI(wx.Frame):
 
 	def __init__(self, parent, title):
-		
-		ack_token = input('enter token: ')
 		# create a non-resizable frame
 		#wx.Frame.__init__(self, parent, title=title, style=wx.DEFAULT_FRAME_STYLE | wx.RESIZE_BORDER)
 		wx.Frame.__init__(self, parent, title=title, size=(1000,800))
@@ -144,7 +141,6 @@ class MyGUI(wx.Frame):
 		# http://stackoverflow.com/questions/6294726/setsizer-setsizerandfit-and-resizing-components
 		self.SetSizer(gridSizer)
 
-
 		# bind the event handlers to clicking of buttons
 		self.Bind(wx.EVT_BUTTON, self.onStatusButton, StatusButton)
 		self.Bind(wx.EVT_BUTTON, self.onPlotButton, PlotButton)
@@ -167,25 +163,11 @@ class MyGUI(wx.Frame):
 		self.session.headers.update({'Authorization': "Bearer %s" % ack_token,})
 
 	def onStatusButton(self, evt):
-		print 'set len: %d\n\r' % len(sets)
-		for i in range(len(sets)):
-			out = sets[i]
-			vol = out[0]
-			title = out[1]
-			plt1 = plt.figure(1,(10,10),60)
-			plt.plot(vol)
-			plt.xlabel('reading number')
-			plt.ylabel('temperature (deg C)')
-			plt.title(title)
-			plt.grid(True, linewidth=3)
-			#plt.show(block=False)
-			plt.show()
-
-		# self.logger.AppendText('Status Button clicked\n')
-		# ret = self.function_call(self.currentDeviceID, "cmd", 'm')
-		# if (ret["return_value"] < 0):
-		# 	print 'cmd function call failed'
-		# print ret["return_value"]
+		print 'Status Button clicked\n'
+		ret = self.function_call(self.currentDeviceID, "cmd", 'm')
+		if (ret["return_value"] < 0):
+			print 'cmd function call failed'
+		print ret["return_value"]
 
 	def onDownloadFileButton(self, evt):
 
@@ -246,15 +228,27 @@ class MyGUI(wx.Frame):
 		self.plot(voltageBatt, voltagePWRIn, title)
 
 	def onPlotButton(self,evt):
+		print 'set len: %d\n\r' % len(sets)
+		for i in range(len(sets)):
+			out = sets[i]
+			vol = out[0]
+			title = out[1]
+			plt1 = plt.figure(1,(10,10),60)
+			plt.plot(vol)
+			plt.xlabel('reading number')
+			plt.ylabel('temperature (deg C)')
+			plt.title(title)
+			plt.grid(True, linewidth=3)
+			#plt.show(block=False)
+			plt.show()
 
-		var1 = []
-		var2 = []
-
-		for d in xrange(0,60):
-			var1.append(str(d))
-			var2.append(str(d +2))
-
-		self.plot(var1, var2, 'TEST DATA ONLY')
+		# var1 = []
+		# var2 = []
+		#
+		# for d in xrange(0,60):
+		# 	var1.append(str(d))
+		# 	var2.append(str(d +2))
+		# self.plot(var1, var2, 'TEST DATA ONLY')
 
 	def onStartLifetestButton(self, evt):
 		ret = self.function_call(self.currentDeviceID, "cmd", 't')
@@ -316,16 +310,20 @@ class MyGUI(wx.Frame):
 			return None
 
 	def onEventStreamButton(self, evt):
-		eventThread().start()
-		# url = API_PREFIX + API_VERSION + 'devices/%s/events?access_token=%s' % (self.currentDeviceID, ack_token)
-		# #response = self.session.get(url)
-		#
-		# messages = SSEClient(url)
-		# for msg in messages:
-		# 	print msg.data
+		try:
+			eventThread().start()
+			#start_thread()
+		except (SystemExit):
+			eventThread().exit()
+			#cleanup_stop_thread();
+		    #sys.exit()
 
+
+
+ack_token = input('enter token: ')
 
 app = wx.App(False)
+
 frame = MyGUI(None,"Wake Python interface")
 
 
