@@ -16,6 +16,7 @@ from time import gmtime, strftime
 
 API_PREFIX = 'https://api.particle.io'
 API_VERSION = '/v1/'
+ack_token = 'blank'
 
 
 readingsPerMsg = 20
@@ -67,6 +68,8 @@ class eventThread(threading.Thread):
 class MyGUI(wx.Frame):
 
 	def __init__(self, parent, title):
+		
+		ack_token = input('enter token: ')
 		# create a non-resizable frame
 		#wx.Frame.__init__(self, parent, title=title, style=wx.DEFAULT_FRAME_STYLE | wx.RESIZE_BORDER)
 		wx.Frame.__init__(self, parent, title=title, size=(1000,800))
