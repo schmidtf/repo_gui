@@ -41,15 +41,15 @@ class eventThread(threading.Thread):
 				frame.logger.AppendText("Event: %s: %s\n" % (msg.event, msg.data))
 
 			if (msg.event[0:4] == 'wake'):
-				print 'msg.id: %s' % msg.id
-				print 'msg.event: %s' % msg.event
-				print msg.data
-				print '\n'
+				print ('msg.id: %s') % msg.id
+				print ('msg.event: %s') % msg.event
+				print (msg.data)
+				print ('\n')
 
 			if (msg.event == 'wake/scan'):
 				scanCount = scanCount + 1
 				index = 9
-				print 'wake/scan msg received #%d\n\r' % scanCount
+				print ('wake/scan msg received #%d\n\r') % scanCount
 				for x in range (0, readingsPerMsg):
 					mychar = '%c%c.%c' % (msg.data[index], msg.data[index+1], msg.data[index+2])
 					#print '%f\n\r' % float(mychar)
@@ -57,7 +57,7 @@ class eventThread(threading.Thread):
 					index = index + 3
 
 				if (scanCount == 5):
-					print 'reset scan count to 0'
+					print ('reset scan count to 0')
 					scanCount = 0;
 					tupl = vals, strftime("%Y-%m-%d %H:%M:%S", gmtime())
 					sets.append(tupl)
@@ -163,21 +163,21 @@ class MyGUI(wx.Frame):
 		self.session.headers.update({'Authorization': "Bearer %s" % ack_token,})
 
 	def onStatusButton(self, evt):
-		print 'Status Button clicked\n'
+		print ('Status Button clicked\n')
 		ret = self.function_call(self.currentDeviceID, "cmd", 'm')
 		if (ret["return_value"] < 0):
-			print 'cmd function call failed'
-		print ret["return_value"]
+			print ('cmd function call failed')
+		print (ret["return_value"])
 
 	def onDownloadFileButton(self, evt):
 
 		if (self.currentDeviceID == -1):
-			print 'select a device ID'
+			print ('select a device ID')
 			return None
 
 		filename = self.filenameText.GetValue()
 
-		print 'filename is: %s' %filename
+		print ('filename is: %s' %filename)
 
 		savename = "D:/Wakee/LifeTesting/" + filename
 
@@ -186,8 +186,8 @@ class MyGUI(wx.Frame):
 		ret = self.function_call(self.currentDeviceID, "dwnldFile", filename)
 
 		if (ret["return_value"] < 0):
-			print 'downloadFile function call failed'
-			print ret["return_value"]
+			print ('downloadFile function call failed')
+			print (ret["return_value"])
 			return None
 
 		cycles = []
@@ -200,14 +200,14 @@ class MyGUI(wx.Frame):
 		while (r == 1):
 			ret = self.function_call(self.currentDeviceID, "rdFilDnld", "cmd")
 			if(ret["return_value"] < 0):
-				print 'readFileDownload functiona call failed'
-				print ret["return_value"]
+				print ('readFileDownload functiona call failed')
+				print (ret["return_value"])
 				r = 0
 				break
 			ret = self.get_variable(self.currentDeviceID, "str2")
 			string = ret["result"]
 			row = string.split(",")
-			print row
+			print (row)
 			newfile.write(string)
 			cycles.append(row[5])
 			voltageBatt.append(row[6])
@@ -217,10 +217,10 @@ class MyGUI(wx.Frame):
 		newfile.close()
 
 		ret = self.function_call(self.currentDeviceID, "closeFile", filename)
-		print 'file close function call sent'
+		print ('file close function call sent')
 		if (ret["return_value"] < 0):
-			print 'closeFile function call failed'
-			print ret["return_value"]
+			print ('closeFile function call failed')
+			print (ret["return_value"])
 			return None
 
 		title = '%s PWR_IN and Battery Voltage' % self.currentDeviceName
@@ -228,7 +228,7 @@ class MyGUI(wx.Frame):
 		self.plot(voltageBatt, voltagePWRIn, title)
 
 	def onPlotButton(self,evt):
-		print 'set len: %d\n\r' % len(sets)
+		print ('number of data sets to plot: %d\n\r' % len(sets))
 		for i in range(len(sets)):
 			out = sets[i]
 			vol = out[0]
@@ -253,23 +253,23 @@ class MyGUI(wx.Frame):
 	def onStartLifetestButton(self, evt):
 		ret = self.function_call(self.currentDeviceID, "cmd", 't')
 		if (ret["return_value"] < 0):
-			print 'cmd function call failed'
-		print ret["return_value"]
+			print ('cmd function call failed')
+		print (ret["return_value"])
 		return None
 
 	def onStartRechargeButton(self, evt):
 		ret = self.function_call(self.currentDeviceID, "cmd", 'c')
 		if (ret["return_value"] < 0):
-			print 'downloadFile function call failed'
-		print ret["return_value"]
+			print ('downloadFile function call failed')
+		print (ret["return_value"])
 		return None
 
 	def onChangeFilenameButton(self, evt):
 		filename = self.filenameText.GetValue()
 		ret = self.function_call(self.currentDeviceID, "chgflnm", filename)
 		if (ret["return_value"] < 0):
-			print 'downloadFile function call failed'
-		print ret["return_value"]
+			print ('downloadFile function call failed')
+		print (ret["return_value"])
 		return None
 
 	def deviceNameComboBoxHandler(self, evt)	:
@@ -306,7 +306,7 @@ class MyGUI(wx.Frame):
 		if response.ok and response.status_code == 200:
 			return response.json()
 		else:
-			print 'get_variable ERROR response not ok or bad status code'
+			print ('get_variable ERROR response not ok or bad status code')
 			return None
 
 	def onEventStreamButton(self, evt):
@@ -331,6 +331,6 @@ try:
 	app.MainLoop()
 except:
 	exc_info = sys.exc_info()
-	print 'failed on exception'
+	print ('failed on exception')
 	input("press something...")
 	raise
